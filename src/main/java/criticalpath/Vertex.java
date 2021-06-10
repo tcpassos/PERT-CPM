@@ -38,4 +38,39 @@ public class Vertex {
         this.revAdj.add(edge);
     }
     
+    /**
+     * Indica se o vertice possui arestas adjacentes
+     *
+     * @return {@code boolean}
+     */
+    public boolean hasLeadingEdges() {
+        return !adj.isEmpty();
+    }
+
+    /**
+     * Indica se o vertice possui arestas reversamente adjacentes
+     *
+     * @return {@code boolean}
+     */
+    public boolean hasTrailingEdges() {
+        return !revAdj.isEmpty();
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public int getName() {
+        return name;
+    }
+
+    public void setName(int name) {
+        this.name = name;
+    }
+
+    
 }
