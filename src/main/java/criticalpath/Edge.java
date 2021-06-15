@@ -9,6 +9,16 @@ public class Edge {
         this.source = source;
         this.destination = destination;
     }
+    
+    /**
+     * Retorna o vértice da outra ponta da aresta
+     *
+     * @param u : Vertex
+     * @return {@code Vertex}
+     */
+    public Vertex otherEnd(Vertex u) {
+        return source == u ? destination : source;
+    }
 
     public Vertex getSource() {
         return source;

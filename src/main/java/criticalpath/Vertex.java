@@ -12,6 +12,7 @@ public class Vertex {
     private int earliestCompletionTime;
     private int latestCompletionTime;
     private int slack;
+    private char color;
 
     public Vertex(int n) {
         this.name = n;
@@ -72,5 +73,49 @@ public class Vertex {
         this.name = name;
     }
 
+    public char getColor() {
+        return color;
+    }
+
+    public void setColor(char color) {
+        this.color = color;
+    }
+
+    public List<Edge> getAdj() {
+        return adj;
+    }
+
+    public List<Edge> getRevAdj() {
+        return revAdj;
+    }
+
+    public void setEarliestCompletionTime(int earliestCompletionTime) {
+        this.earliestCompletionTime = earliestCompletionTime;
+    }
     
+    public int getEarliestCompletionTime() {
+        return earliestCompletionTime;
+    }
+
+    public void setLatestCompletionTime(int latestCompletionTime) {
+        this.latestCompletionTime = latestCompletionTime;
+    }
+
+    public int getLatestCompletionTime() {
+        return latestCompletionTime;
+    }
+
+    public void setSlack(int slack) {
+        this.slack = slack;
+    }
+
+    public int getSlack() {
+        return slack;
+    }
+
+    @Override
+    public String toString() {
+        return "Vertex{" + "name=" + name + ", adj=" + adj + '}';
+    }
+
 }

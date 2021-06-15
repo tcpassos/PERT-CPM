@@ -18,7 +18,7 @@ public class DirectedGraph implements Iterable<Vertex> {
 
     public DirectedGraph(int size) {
         this.size = size;
-        this.vertexList = new ArrayList<>();
+        this.vertexList = new ArrayList<>(size + 1);
         this.vertexList.add(0, null);
         IntStream.rangeClosed(1, size).forEach(i -> vertexList.add(i, new Vertex(i)));
     }
@@ -31,6 +31,15 @@ public class DirectedGraph implements Iterable<Vertex> {
      */
     public Vertex getVertex(int n) {
         return vertexList.get(n);
+    }
+    
+    /**
+     * Retorna os vértices do grafo
+     *
+     * @return {@code List<Vertex>}
+     */
+    public List<Vertex> getVertexes() {
+        return vertexList;
     }
 
     /**
@@ -69,8 +78,8 @@ public class DirectedGraph implements Iterable<Vertex> {
     public static DirectedGraph readGraph() {
         // Faz a leitura da quantidade de arestas e vertices do grafo
         List<Integer> in = _readLineParams();
-        int edgeCount = in.get(0);
-        int vertexCount = in.get(1);
+        int vertexCount = in.get(0);
+        int edgeCount = in.get(1);
         DirectedGraph g = new DirectedGraph(vertexCount);
         // Faz a leitura das arestas do grafo
         for (int i=0; i<edgeCount; i++) {
@@ -84,9 +93,16 @@ public class DirectedGraph implements Iterable<Vertex> {
             v.setDuration(in.get(count++));
         }
         // Conecta o vertice inicial aos demais vertices
-        Vertex s = g.vertexList.get(g.getSize() - 2);
-        Vertex t = g.vertexList.get(g.getSize() - 1);
-        g.vertexList.stream().filter((v) -> (v != null && !v.hasTrailingEdges() && v != s && v != t)).forEach((v) -> g.addEdge(s, v));
+        int size = g.vertexList.size();
+        Vertex s = g.vertexList.get(size - 2);
+        Vertex t = g.vertexList.get(size - 1);
+        g.vertexList.stream()
+                    .filter(v -> v != null && !v.hasTrailingEdges() && v != s && v != t)
+                    .forEach((v) -> g.addEdge(s, v));
+        // Conecta o último vértice aos demais vértices
+        g.getVertexes().stream()
+                       .filter(v -> v != null && v.getAdj().isEmpty() && v != s && v != t)
+                       .forEach(v -> g.addEdge(v, t));
         return g;
     }
     
