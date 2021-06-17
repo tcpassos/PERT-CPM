@@ -80,7 +80,7 @@ public class DirectedGraph implements Iterable<Vertex> {
         List<Integer> in = _readLineParams();
         int vertexCount = in.get(0);
         int edgeCount = in.get(1);
-        DirectedGraph g = new DirectedGraph(vertexCount);
+        DirectedGraph g = new DirectedGraph(vertexCount + 2);
         // Faz a leitura das arestas do grafo
         for (int i=0; i<edgeCount; i++) {
             in = _readLineParams();
@@ -89,13 +89,16 @@ public class DirectedGraph implements Iterable<Vertex> {
         // Faz a leitura da duracao de cada vertice
         int count = 0;
         in = _readLineParams();
-        for (Vertex v: g) {
-            v.setDuration(in.get(count++));
+        for (int i=1; i<g.vertexList.size() - 2; i++) {
+            g.getVertex(i).setDuration(in.get(count++));
         }
-        // Conecta o vertice inicial aos demais vertices
+        // Cria vertices auxiliares representando o inicio e o fim do grafo
         int size = g.vertexList.size();
         Vertex s = g.vertexList.get(size - 2);
         Vertex t = g.vertexList.get(size - 1);
+        s.setDuration(0);
+        t.setDuration(0);
+        // Conecta o vertice inicial aos demais vertices
         g.vertexList.stream()
                     .filter(v -> v != null && !v.hasTrailingEdges() && v != s && v != t)
                     .forEach((v) -> g.addEdge(s, v));

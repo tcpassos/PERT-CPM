@@ -2,6 +2,7 @@ package criticalpath;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Vertex {
     
@@ -12,7 +13,7 @@ public class Vertex {
     private int earliestCompletionTime;
     private int latestCompletionTime;
     private int slack;
-    private char color;
+    private Color color;
 
     public Vertex(int n) {
         this.name = n;
@@ -73,24 +74,41 @@ public class Vertex {
         this.name = name;
     }
 
-    public char getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(char color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
     public List<Edge> getAdj() {
         return adj;
     }
+    
+    public List<Vertex> getAdjVertexes() {
+        return adj.stream().map(e -> e.otherEnd(this)).collect(Collectors.toList());
+    }
 
     public List<Edge> getRevAdj() {
         return revAdj;
     }
+    
+    public List<Vertex> getRevAdjVertexes() {
+        return revAdj.stream().map(e -> e.otherEnd(this)).collect(Collectors.toList());
+    }
 
     public void setEarliestCompletionTime(int earliestCompletionTime) {
         this.earliestCompletionTime = earliestCompletionTime;
+    }
+    
+    /**
+     * Atualiza o menor tempo de início caso o novo valor seja maior que o atual
+     *
+     * @param ec Novo valor para o menor tempo de início
+     */
+    public void updateEarliestCompletionTime(int ec) {
+        this.earliestCompletionTime = Math.max(this.earliestCompletionTime, ec);
     }
     
     public int getEarliestCompletionTime() {
@@ -99,6 +117,15 @@ public class Vertex {
 
     public void setLatestCompletionTime(int latestCompletionTime) {
         this.latestCompletionTime = latestCompletionTime;
+    }
+
+    /**
+     * Atualiza o maior tempo de comnclusao caso o novo valor seja menor que o atual
+     *
+     * @param lc Novo valor para o maior tempo de conclusao
+     */
+    public void updateLatestCompletionTime(int lc) {
+        this.latestCompletionTime = Math.min(latestCompletionTime, lc);
     }
 
     public int getLatestCompletionTime() {
@@ -115,7 +142,7 @@ public class Vertex {
 
     @Override
     public String toString() {
-        return "Vertex{" + "name=" + name + ", adj=" + adj + '}';
+        return String.valueOf(name);
     }
 
 }
