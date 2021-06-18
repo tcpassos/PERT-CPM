@@ -24,52 +24,71 @@ public class CriticalPaths {
      * Encontra os caminhos críticos em um grafo
      */
     public void findCriticalPaths() {
+        // Monta a visualizacao da ordem topologica do grafo
         LinkedList<Vertex> topologicalOrder = new DepthFirstSearch(graph).getTopologicalOrder();
-        int size = graph.getVertexes().size();
-        /**
-         * Calculo do menor tempo de conclusao das tarefas
-         */
-        Vertex s = graph.getVertexes().get(size - 2);
+        // Calcula os tempos de conclusao das tarefas
+        _calculateEarliestCompletionTime(topologicalOrder);
+        _calculateLatestCompletionTime(topologicalOrder);
+        // Calcula a folga das tarefas
+        _calculateSlack();
+        // Enumera os caminhos criticos 
+        Vertex[] path = new Vertex[graph.getVertexes().size() - 1];
+        _enumeratePaths(path, graph.start(), 0, graph.end());
+        // Imprime os resultados do algoritmo
+        _printResults();
+    }
+    
+    /**
+     * Calcula o menor tempo de conclusao das tarefas
+     */
+    private void _calculateEarliestCompletionTime(LinkedList<Vertex> topologicalOrder) {
         graph.getVertexes().stream().filter(Objects::nonNull)
                            .forEach(v -> v.setEarliestCompletionTime(Integer.MIN_VALUE));
-        s.setEarliestCompletionTime(0);
+        graph.start().setEarliestCompletionTime(0);
         // Percorre os vertices atualizando o menor tempo de inicio de cada um
         topologicalOrder.forEach(u -> {
             u.getAdjVertexes().forEach(v -> v.updateEarliestCompletionTime(u.getEarliestCompletionTime() + v.getDuration()));
         });
-        /**
-         * Calculo do maior tempo de conclusao das tarefas
-         */
-        Vertex t = graph.getVertexes().get(size - 1);
+    }
+
+    /**
+     * Calcula o maior tempo de conclusao das tarefas
+     */
+    private void _calculateLatestCompletionTime(LinkedList<Vertex> topologicalOrder) {
         // Definine o valor do maior tempo de conclusao dos vertices como o menor tempo de conclusao das tarefas
-        t.setLatestCompletionTime(t.getEarliestCompletionTime());
+        graph.end().setLatestCompletionTime(graph.end().getEarliestCompletionTime());
         graph.getVertexes().stream().filter(Objects::nonNull)
-                           .forEach(u -> u.setLatestCompletionTime(t.getLatestCompletionTime()));
+                           .forEach(u -> u.setLatestCompletionTime(graph.end().getLatestCompletionTime()));
         // Inverte a ordem topologica e percorre novamente os caminhos calculando a LC dos vertices
         Iterator<Vertex> reverseIt = topologicalOrder.descendingIterator();
         while(reverseIt.hasNext()) {
             Vertex u = reverseIt.next();
             u.getRevAdjVertexes().forEach(v -> v.updateLatestCompletionTime(u.getLatestCompletionTime() - u.getDuration()));
         }
-        /**
-         * Calcula a folga subtraindo EC de LC
-         */
+    }
+
+    /**
+     * Calcula a folga subtraindo EC de LC
+     */
+    private void _calculateSlack() {
         numberOfCriticalNodes = graph.getVertexes().stream().filter(Objects::nonNull)
                                      .peek(v -> v.setSlack(v.getLatestCompletionTime() - v.getEarliestCompletionTime()))
-                                     .filter(v -> v.getSlack() == 0 && v != s && v != t)
+                                     .filter(v -> v.getSlack() == 0 && v != graph.start() && v != graph.end())
                                      .count();
-        // Armazena os caminhos criticos
-        Vertex[] path = new Vertex[graph.getVertexes().size() - 1];
-        _enumeratePaths(path, s, 0, t);
-        // Imprime os resultados
+    }
+    
+    /**
+     * Imprime os resultados do algoritmo
+     */
+    private void _printResults() {
         System.out.println("\nTarefa" + "\t" + "EC" + "\t" + "LC" + "\t" + "Folga");
         int task = 0;
         for (Vertex u : graph.getVertexes()) {
-            if (u != null && u != s && u != t) {
+            if (u != null && u != graph.start() && u != graph.end()) {
                 System.out.println(++task + "\t" + u.getEarliestCompletionTime() + "\t" + u.getLatestCompletionTime() + "\t" + u.getSlack());
             }
         }
-        System.out.println("\nTempo de conclusao: " + t.getLatestCompletionTime());
+        System.out.println("\nTempo de conclusao: " + graph.end().getLatestCompletionTime());
         System.out.println("Nodes criticos: " + numberOfCriticalNodes);
         System.out.println("Caminhos criticos: " + allPaths.size());
         allPaths.forEach(p -> {
@@ -90,12 +109,12 @@ public class CriticalPaths {
         if (u == t) {
             allPaths.add(path.clone());
         } else {
-            u.getAdj().stream()
-                      .map(e -> e.otherEnd(u))
-                      .filter(v -> ((u.getLatestCompletionTime() == u.getEarliestCompletionTime()) &&
-                                    (v.getLatestCompletionTime() == v.getEarliestCompletionTime()) &&
-                                    (u.getLatestCompletionTime() + v.getDuration() == v.getLatestCompletionTime())))
-                      .forEach(v -> _enumeratePaths(path, v, index + 1, t));
+            u.getAdjVertexes()
+             .stream()
+             .filter(v -> ((u.getLatestCompletionTime() == u.getEarliestCompletionTime()) &&
+                           (v.getLatestCompletionTime() == v.getEarliestCompletionTime()) &&
+                           (u.getLatestCompletionTime() + v.getDuration() == v.getLatestCompletionTime())))
+             .forEach(v -> _enumeratePaths(path, v, index + 1, t));
         }
     }
 

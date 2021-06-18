@@ -52,6 +52,24 @@ public class DirectedGraph implements Iterable<Vertex> {
     }
     
     /**
+     * Retorna o vértice que representa o início do grafo
+     *
+     * @return {@code Vertex}
+     */
+    public Vertex start() {
+        return vertexList.get(vertexList.size() - 2);
+    }
+
+    /**
+     * Retorna o vértice que representa o final do grafo
+     *
+     * @return {@code Vertex}
+     */
+    public Vertex end() {
+        return vertexList.get(vertexList.size() - 1);
+    }
+    
+    /**
      * Adiciona uma aresta no grafo
      * 
      * @param source Vertice origem
