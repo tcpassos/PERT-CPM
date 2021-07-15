@@ -21,8 +21,7 @@ public class DepthFirstSearch {
      */
     public LinkedList<Vertex> getTopologicalOrder() {
         // Inicializa todos os vertices para a cor branca
-        graph.getVertexes().stream()
-                           .filter(Objects::nonNull)
+        graph.getVertexes().stream().filter(Objects::nonNull)
                            .forEach(v -> v.setColor(Color.WHITE));
         topologicalOrder.clear();
         // Visita os vertices recursivamente
@@ -39,10 +38,9 @@ public class DepthFirstSearch {
         // Muda a cor para cinza indicando que esta no vertice
         u.setColor(Color.GRAY);
         // Visita recursivamente os nodes que ainda nao foram visitados (brancos)
-        u.getAdj().stream()
-                  .map(e -> e.otherEnd(u))
-                  .filter(v -> v != null && v.getColor() == Color.WHITE)
-                  .forEach(v -> dfsVisit(g, v));
+        u.getAdjVertexes().stream()
+                          .filter(v -> v != null && v.getColor() == Color.WHITE)
+                          .forEach(v -> dfsVisit(g, v));
         // Muda a cor para preto indicando que ja foi visitado
         u.setColor(Color.BLACK);
         // Insere o node na primeira posicao da lista de ordem topologica

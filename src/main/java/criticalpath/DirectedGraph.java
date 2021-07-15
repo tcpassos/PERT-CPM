@@ -110,7 +110,7 @@ public class DirectedGraph implements Iterable<Vertex> {
         for (int i=1; i<g.vertexList.size() - 2; i++) {
             g.getVertex(i).setDuration(in.get(count++));
         }
-        // Cria vertices auxiliares representando o inicio e o fim do grafo
+        // Cria vertices auxiliares representando o inicio e o fim das atividades
         int size = g.vertexList.size();
         Vertex s = g.vertexList.get(size - 2);
         Vertex t = g.vertexList.get(size - 1);

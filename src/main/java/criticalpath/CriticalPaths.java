@@ -56,9 +56,8 @@ public class CriticalPaths {
      */
     private void _calculateLatestCompletionTime(LinkedList<Vertex> topologicalOrder) {
         // Definine o valor do maior tempo de conclusao dos vertices como o menor tempo de conclusao das tarefas
-        graph.end().setLatestCompletionTime(graph.end().getEarliestCompletionTime());
         graph.getVertexes().stream().filter(Objects::nonNull)
-                           .forEach(u -> u.setLatestCompletionTime(graph.end().getLatestCompletionTime()));
+                           .forEach(u -> u.setLatestCompletionTime(graph.end().getEarliestCompletionTime()));
         // Inverte a ordem topologica e percorre novamente os caminhos calculando a LC dos vertices
         Iterator<Vertex> reverseIt = topologicalOrder.descendingIterator();
         while(reverseIt.hasNext()) {
@@ -73,8 +72,24 @@ public class CriticalPaths {
     private void _calculateSlack() {
         numberOfCriticalNodes = graph.getVertexes().stream().filter(Objects::nonNull)
                                      .peek(v -> v.setSlack(v.getLatestCompletionTime() - v.getEarliestCompletionTime()))
-                                     .filter(v -> v.getSlack() == 0 && v != graph.start() && v != graph.end())
+                                     .filter(v -> v.isCritical() && v != graph.start() && v != graph.end())
                                      .count();
+    }
+    
+    /**
+     * Realiza a enumeracao dos caminhos criticos encontrados
+     */
+    private void _enumeratePaths(Vertex[] path, Vertex u, int index, Vertex end) {
+        path[index] = u;
+        if (u == end) {
+            allPaths.add(path.clone());
+        } else {
+            u.getAdjVertexes()
+             .stream()
+             .filter(v -> (u.isCritical() && v.isCritical() &&
+                          (u.getLatestCompletionTime() + v.getDuration() == v.getLatestCompletionTime())))
+             .forEach(v -> _enumeratePaths(path, v, index + 1, end));
+        }
     }
     
     /**
@@ -99,23 +114,6 @@ public class CriticalPaths {
             fmtPath = Arrays.copyOf(fmtPath, fmtPath.length - 1);
             System.out.println(Arrays.toString(fmtPath));
         });
-    }
-    
-    /**
-     * Realiza a enumeracao dos caminhos criticos encontrados
-     */
-    private void _enumeratePaths(Vertex[] path, Vertex u, int index, Vertex t) {
-        path[index] = u;
-        if (u == t) {
-            allPaths.add(path.clone());
-        } else {
-            u.getAdjVertexes()
-             .stream()
-             .filter(v -> ((u.getLatestCompletionTime() == u.getEarliestCompletionTime()) &&
-                           (v.getLatestCompletionTime() == v.getEarliestCompletionTime()) &&
-                           (u.getLatestCompletionTime() + v.getDuration() == v.getLatestCompletionTime())))
-             .forEach(v -> _enumeratePaths(path, v, index + 1, t));
-        }
     }
 
 }

@@ -139,6 +139,10 @@ public class Vertex {
     public int getSlack() {
         return slack;
     }
+    
+    public boolean isCritical() {
+        return latestCompletionTime == earliestCompletionTime;
+    }
 
     @Override
     public String toString() {
